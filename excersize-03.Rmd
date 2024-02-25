@@ -3,12 +3,33 @@ title: "EDA-Challenge.Rmd"
 author: "Jessica V"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
+```{r}
+library(tidyverse)
+```
+
+#Here I am reading the dataset
+"https://raw.githubusercontent.com/difiore/ada-2024-datasets/main/data-wrangling.csv"
+
+```{r}
+f <- "https://raw.githubusercontent.com/difiore/ada-2024-datasets/main/data-wrangling.csv"
+
+d <- read_csv(f, col_names = TRUE)
+```
+
+#Here we can look at the variables it contains
+
+```{r}
+names(d)
+```
 # Here I an creating a new variable named BSD (body size dimorphism) which is the ratio of average male to female body mass.
 
 # I need to use the following Body_mass_male_mean"  "Body_mass_female_mean"
 ```{r}
+
 BSD <- d$ratio <- d$Body_mass_male_mean/d$Body_mass_female_mean
 
 BSD
@@ -112,10 +133,20 @@ folivore
 omnivore
 
 ```{r}
-d$diet_strategy <-c (mutate(d, diet = ifelse(Fruit >= 50, "frugivore", ifelse(Leaves >= 50, "folivore",
-    "omnivore"))))
-diet
-mutate(d, diet = case_when(Fruit >= 50 ~ "frugivore", Leaves >= 50 ~ "folivore",
-    Fruit < 50 & Leaves < 50 ~ "omnivore")))
 
+d %>% mutate(diet = case_when(Fruit >= 50 ~ "frugivore", Leaves >= 50 ~ "folivore",
+    Fruit < 50 & Leaves < 50 ~ "omnivore")) -> d
+d
+```
+
+#8
+
+```{r}
+ss <- mutate(d, Binomial = paste(Genus, Species, sep = " ")) %>%
+    select(Binomial, Family, Brain_Size_Species_Mean, Body_mass_male_mean) %>%
+    group_by(Family) %>%
+    summarise(avgF = mean(Brain_Size_Species_Mean, na.rm = TRUE), avgM = mean(Body_mass_male_mean,
+        na.rm = TRUE)) %>%
+    arrange(desc(avgF))
+ss
 ```
